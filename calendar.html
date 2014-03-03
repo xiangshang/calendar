@@ -181,18 +181,7 @@
 			},
 			addMonth: function(year,month) {
 				for(var i= 1;i<=12;i++) {						
-					if(i == 1) {test = 'ä¸€'}
-					if(i == 2) {test = 'äºŒ'}
-					if(i == 3) {test = 'ä¸‰'}
-					if(i == 4) {test = 'å››'}
-					if(i == 5) {test = 'äº”'}
-					if(i == 6) {test = 'å…­'}
-					if(i == 7) {test = 'ä¸ƒ'}
-					if(i == 8) {test = 'å…«'}
-					if(i == 9) {test = 'ä¹'}
-					if(i == 10) {test = 'å'}
-					if(i == 11) {test = 'åä¸€'}
-					if(i == 12) {test = 'åäºŒ'}
+					var test = {1:'Ò»',2:'¶þ',3:'Èý',4:'ËÄ',5:'Îå',6:'Áù',7:'Æß',8:'°Ë',9:'¾Å',10:'Ê®',11:'Ê®Ò»',12:'Ê®¶þ'}[i];
 					if(i == month) {
 						var monthDiv = this.createElement('div',year+'-' + (i-1),'month focus',test+'æœˆ');
 					} else {
