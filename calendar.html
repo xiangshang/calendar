@@ -1,0 +1,269 @@
+<!doctype html>
+<html>
+	<head>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8">
+	<link href='lib/css/bootstrap.css' rel='stylesheet'>
+	<style type='text/css'>
+	.panel{
+		width: 200px;
+		height: 212px;
+		border: 1px gray solid;
+	}
+	.day{
+		width:28px;
+		height:26px;
+		display:inline-block;
+	}
+	.week{width:28px;height:26px;display:inline-block;}
+	.day:hover,.month:hover,.year:hover{cursor:pointer;color:#097bde;}
+	.year{text-align:center;}
+	.month { display: inline-block;
+		height: 42px;
+		line-height: 47px;
+			text-align: center;
+			width: 65px;}
+	.focus {color:red;}
+	.notnow {color:gray;}
+	</style>	
+	</head>
+	<body>
+		<input type='text' id='inputcal'>
+		<div id='calendar'></div>
+		<script type='text/javascript'>
+		
+		window.onload = function() {
+			 var flag= true;
+			 getid('inputcal').onclick = function() {
+			    if(flag) {
+					 
+					getid('calendar').appendChild(calendar.createElement("div","panel","panel") );
+					var hora = calendar.getDay(2012,5,12);					
+					calendar.addPanel(hora);
+					flag = false;
+				} else {
+					calendar.empty('calendar');
+					flag = true;
+				}
+			 }
+			
+		}
+		var calendar = {
+			year:'',
+			month:'', 
+			day:'',
+			date:'',
+			now:'',
+			allDates:'',
+			showNum:42,
+			//计算星期几
+			getDay:function(year,month,date) {			
+				    var d = new Date();
+					d.setYear(year);
+					if(month) {
+						d.setMonth(month);
+					} else {
+						d.setMonth(7);
+					}
+					if(date) {
+						d.setDate(date);
+					} else {
+						d.setDate(15);
+					}
+					 			 
+					var day = d.getDay();
+					return [year,month,date,day];
+			},
+			//计算一个月有几天
+			getMonth:function(year,month) {
+				var allDates = '';
+				month = parseInt(month);
+				 
+				if((month == 0) || (month == 2) || (month == 4) || (month == 6) || (month == 7) || (month == 9) || (month == 11) ) {
+					 allDates = 31;				
+				} else if(month == 1){
+					 
+					if(( year %4 == 0) &&( year % 100 !=0)) {
+						 allDates = 29;
+					}	else {
+						 allDates = 28;
+					}
+				} else {
+					 allDates = 30;
+				}
+				return allDates;
+			},
+			//生成div
+			createElement:function(tag,id,classname,text) {
+				var element = document.createElement(tag);
+				element.className = classname;
+				if(!!id) {
+					element.id = id;				}				
+				if(!!text) {
+					var text = document.createTextNode(text);
+					element.appendChild(text);
+				}	
+				return element;
+			},
+			//清空
+			empty:function(id) {
+				div = getid(id);
+				while(div.lastChild) //当div下还存在末尾节点时 循环继续
+				{div.removeChild(div.lastChild) }
+			
+			},
+			//添加div
+			addPanel:function(hora) {				
+				var year = hora[0];
+				var month = hora[1];
+				
+				var date = hora[2];
+				var day = hora[3];
+				 
+				var yearDiv = this.createElement('div', year+'-'+(parseInt(month)+1),'year',year+'年'+ (parseInt(month)+1) +'月');
+				getid('panel').appendChild(yearDiv);
+				yearDiv.addEventListener('click',function(event){ 					
+					var content = event.target.id;
+					//显示月份
+					
+					if(content.indexOf('-')) {
+						calendar.empty('panel');
+						var yearDiv = calendar.createElement('div',year,'year',year);
+						getid('panel').appendChild(yearDiv);
+						yearDiv.addEventListener('click',function() {
+							var content = parseInt(event.target.id);
+							var begin = parseInt(content/10)*10;
+							var end = parseInt(content/10)*10+11;
+							calendar.empty('panel');
+							getid('panel').appendChild(calendar.createElement('div',begin+'-'+end,'year',begin+'-'+end));
+							calendar.addYear(begin,end);
+						},false);
+						calendar.addMonth(year,(parseInt(month)+1)); 
+					}else if(content.indexOf('&')) {
+					
+					} else {
+						calendar.empty('panel');
+						getid('panel').appendChild(calendar.createElement('div',year,'year',year));
+					}				
+				},false);				 
+				 
+				this.addWeek(date);		
+				this.addDate(year,month,date);				
+				 
+				
+			},
+			addYear:function(begin,end){
+				for(i=0;i<12;i++){
+					if((i== 0 )||(i == 11)) {
+						yearDiv = this.createElement('div',begin+i,'month notnow',begin+i);
+					} else {
+						yearDiv = this.createElement('div',begin+i,'month',begin+i);
+					}
+					
+					getid('panel').appendChild(yearDiv);	
+					yearDiv.addEventListener('click',function(event) {
+						var content = event.target.id;
+						calendar.empty('panel');
+						var yearDiv = calendar.createElement('div', content,'year',content);
+						getid('panel').appendChild(yearDiv);
+						yearDiv.addEventListener('click',function(event) {
+							var content = parseInt(event.target.id);
+							var begin = parseInt(content/10)*10-1;
+							var end = parseInt(content/10)*10+10;
+							calendar.empty('panel');
+							getid('panel').appendChild(calendar.createElement('div',begin+'-'+end,'year',begin+'-'+end));
+							calendar.addYear(begin,end);
+							
+						},false);
+						calendar.addMonth(content,7);
+						
+					},false);
+				}
+			},
+			addMonth: function(year,month) {
+				for(var i= 1;i<=12;i++) {						
+					var test = {1:'一',2:'二',3:'三',4:'四',5:'五',6:'六',7:'七',8:'八',9:'九',10:'十',11:'十一',12:'十二'}[i]
+					if(i == month) {
+						var monthDiv = this.createElement('div',year+'-' + (i-1),'month focus',test+'月');
+					} else {
+						var monthDiv = this.createElement('div',year+'-' + (i-1),'month',test+'月');
+					
+					getid('panel').appendChild(monthDiv);	
+					monthDiv.addEventListener('click',function(event) {
+						var text = event.target.id;
+						calendar.empty('panel');
+						var year = text.split('-')[0];
+						var month = text.split('-')[1];
+						var day = calendar.getDay(year,month);
+						var hora = [year,month,15,day];
+						calendar.addPanel(hora);
+						
+					},false);
+				}						
+			},
+			addWeek:function(date) {
+				for(var i= 1;i<=7;i++) {						
+					var test = {2:'一',3:'二',4:'三',5:'四',6:'五',7:'六',1:'日'}[i]
+				 
+					var monthDiv = this.createElement('div','day' + i,'week',test);
+					getid('panel').appendChild(monthDiv);						
+				}
+				
+			
+			},
+			addDate:function(year,month,date) {
+				 
+				var monthNo = this.getMonth(year,month); 
+				 
+				var day = this.getDay(year,month,date)[3];
+				if(month == 0){
+					var lastMonthNo = this.getMonth((parseInt(year)-1),11);
+				}else {
+					var lastMonthNo = this.getMonth(year,(parseInt(month)-1));
+				}
+				
+				date = date%7;
+				var week = (day - (date-1))%7;
+				week = (week>0)?week:week+7;
+				 
+				 
+					for(var i = 1;i<=week;i++) {
+						var day = this.createElement('div',year+'-'+(parseInt(month)) +'-' + (lastMonthNo-week+i),'day notnow',(lastMonthNo-week+i));
+						getid('panel').appendChild(day);
+						day.addEventListener('click',function(event) {
+						var text=event.target.id;
+						getid('inputcal').value=text;
+					
+					},false)
+					}
+			 
+				
+				
+				for(var i= 1;i<=monthNo;i++) {
+					var day = this.createElement('div',year+'-'+(parseInt(month)+1) +'-' + i,'day',i);
+					getid('panel').appendChild(day);
+					day.addEventListener('click',function(event) {
+						var text=event.target.id;
+						getid('inputcal').value=text;
+					
+					},false)
+				}
+				var number = this.showNum - week - monthNo;
+				for (var i = 1;i<=number;i++){
+					var day = this.createElement('div',year+'-'+(parseInt(month)+2)+'-' + i,'day notnow',i);
+					getid('panel').appendChild(day);
+					day.addEventListener('click',function(event) {
+						var text=event.target.id;
+						getid('inputcal').value=text;
+					
+					},false)
+				}
+			},
+			
+		}
+		function getid (id) {
+			return document.getElementById(id)
+		}
+		</script>
+	</body>
+	
+</html>
